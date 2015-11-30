@@ -5,6 +5,7 @@
  */
 package is.task.manager.server;
 
+import is.task.manager.client.SingleData;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -87,5 +88,20 @@ public class DBM {
 
         }
 
+    }
+
+    void insertProject(SingleData sd) {
+        try {
+            stmt = conn.createStatement();
+            stmt.execute("INSERT INTO APP.PROJECT "
+                    + "(IDPROJECT, IDCLIENT, IDWORKER, "
+                    + "NOMBRE, DESCRIPTION, FILEPATH, VERSION) \n"
+                    + "	VALUES (," + sd.getClientId() + ", " + sd.getAuthor() 
+                    + ", '" + sd.getName() + "', "+ "'" + sd.getDescription() + "', '"
+                    + sd.getFile() + "', '" + sd.getVersion() + "')\n");
+            stmt.close();
+        } catch (SQLException sqlExcept) {
+            sqlExcept.printStackTrace();
+        }
     }
 }

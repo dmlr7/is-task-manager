@@ -5,11 +5,17 @@
  */
 package is.task.manager.client;
 
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author dmlr7
  */
-public final class SingleData {
+public final class SingleData implements Serializable{
 
     private String name;
     private String clientId;
@@ -117,6 +123,17 @@ public final class SingleData {
      */
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    void save(String string) {
+        
+        try {
+            FileOutputStream fos = new FileOutputStream("~/sd.dat");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(this);
+        } catch (Exception ex) {
+            Logger.getLogger(DataProject.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

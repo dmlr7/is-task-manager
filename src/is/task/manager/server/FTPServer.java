@@ -10,21 +10,30 @@ package is.task.manager.server;
  * @author dmlr7
  */
 // FTP Server
+import is.task.manager.client.Client;
+import is.task.manager.client.DataProject;
+import is.task.manager.client.SingleData;
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class FTPServer  extends Thread {
-    
+public class FTPServer extends Thread {
+
     public DBM dbm;
-    
+
     Socket ClientSoc;
 
     DataInputStream din;
     DataOutputStream dout;
+    DataProject dp;
 
     FTPServer(Socket soc) {
+        dp = new DataProject();
+        dp=dp.load();
         try {
+            
             ClientSoc = soc;
             din = new DataInputStream(ClientSoc.getInputStream());
             dout = new DataOutputStream(ClientSoc.getOutputStream());
@@ -36,6 +45,7 @@ public class FTPServer  extends Thread {
     }
 
     void SendFile() throws Exception {
+        dp.load();
         String filename = din.readUTF();
         File f = new File(filename);
         if (!f.exists()) {
@@ -52,6 +62,16 @@ public class FTPServer  extends Thread {
             fin.close();
             dout.writeUTF("File Receive Successfully");
         }
+        try {
+            FileInputStream fin = new FileInputStream(f);
+            ObjectInputStream objin = new ObjectInputStream(fin);
+            SingleData sd = (SingleData) (objin.readObject());
+            dbm.insertProject(sd);
+            dp.getProjects().add(sd);
+        } catch (Exception ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        dp.save();
     }
 
     void ReceiveFile() throws Exception {
@@ -82,13 +102,14 @@ public class FTPServer  extends Thread {
                 }
             } while (ch != -1);
             fout.close();
+
             dout.writeUTF("File Send Successfully");
         } else {
             return;
         }
 
     }
-
+    
     @Override
     public void run() {
         while (true) {

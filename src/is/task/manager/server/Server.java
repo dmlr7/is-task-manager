@@ -5,6 +5,7 @@
  */
 package is.task.manager.server;
 
+import is.task.manager.client.DataProject;
 import java.net.ServerSocket;
 
 /**
@@ -14,6 +15,7 @@ import java.net.ServerSocket;
 public class Server {
     public static void main(String args[]) throws Exception {
         DBM dbm = new DBM();
+        DataProject dp = new DataProject();
         dbm.createConnection();
         ServerSocket soc = new ServerSocket(5217);
         System.out.println("FTP Server Started on Port Number 5217");
@@ -21,6 +23,7 @@ public class Server {
             System.out.println("Waiting for Connection ...");
             FTPServer t = new FTPServer(soc.accept());
             t.dbm=dbm;
+            t.dp=dp;
         }
     }
 }
